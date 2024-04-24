@@ -1,11 +1,17 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
 type app struct{}
+
+// test
+type messageJson struct {
+	message string `json:"message"`
+}
 
 func (a *app) Run() {
 	// start routes
@@ -13,8 +19,19 @@ func (a *app) Run() {
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		phrase := "Ola mundo!\n"
-		w.Write([]byte(phrase))
+		w.Header().Set("Content-Type", "application/json")
+
+		msg := messageJson{
+			message: "ola mundo!",
+		}
+
+		result, err := json.Marshal(msg)
+
+		if err != nil {
+			panic(err)
+		}
+
+		w.Write(result)
 	})
 
 	fmt.Printf("server start :0\n")

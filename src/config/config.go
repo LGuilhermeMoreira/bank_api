@@ -18,7 +18,7 @@ func NewConfig() *config {
 }
 
 func getPort() int {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		panic(err)
 	}
 

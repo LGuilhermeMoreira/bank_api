@@ -1,9 +1,9 @@
 package main
 
-import "github.com/LGuilhermeMoreira/bank_api/src/models"
+import "github.com/LGuilhermeMoreira/bank_api/src/utils/app"
 
 func main() {
-	app := models.NewApp()
+	app := app.NewApp()
 	app.Run()
 }
 

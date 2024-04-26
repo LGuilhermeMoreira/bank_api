@@ -7,6 +7,7 @@ import (
 
 	"github.com/LGuilhermeMoreira/bank_api/src/config"
 	"github.com/LGuilhermeMoreira/bank_api/src/controller"
+	"github.com/LGuilhermeMoreira/bank_api/src/database"
 )
 
 type app struct{}
@@ -22,6 +23,8 @@ func (a *app) Run() {
 	mux := http.NewServeMux()
 
 	config := config.NewConfig()
+
+	connection := database.NewConnection()
 
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
@@ -39,7 +42,9 @@ func (a *app) Run() {
 
 		w.Write(result)
 	})
-	mux.HandleFunc("POST /", controller.NewAccountController().HandlePostAccount)
+	mux.HandleFunc("POST /account/", controller.NewAccountController(connection).HandlePostAccount)
+	mux.HandleFunc("GET /account/{id}", controller.NewAccountController(connection).HandleGetAccountByID)
+	mux.HandleFunc("GET /account/", controller.NewAccountController(connection).HandleGetAllAccount)
 
 	fmt.Printf("server start :0\n")
 

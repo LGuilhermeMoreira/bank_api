@@ -1,21 +1,25 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
 
-type connection struct {
+	_ "github.com/go-sql-driver/mysql"
+)
+
+type Connection struct {
 	Db   *sql.DB
 	name string
 	uri  string
 }
 
-func NewConnection() *connection {
+func NewConnection() *Connection {
 	db, err := sql.Open("mysql", "guigui:guigui@tcp(localhost:3305)/bank_db")
 
 	if err != nil {
 		panic(err)
 	}
 
-	return &connection{
+	return &Connection{
 		Db:   db,
 		name: "mysql",
 		uri:  "guigui:guigui@tcp(localhost:3305)/bank_db",

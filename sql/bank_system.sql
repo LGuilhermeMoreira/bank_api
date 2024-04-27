@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `entries` (
     `account_id` VARCHAR(255),
     `amount` FLOAT NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`)
+    FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `transfers` (

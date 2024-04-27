@@ -42,9 +42,12 @@ func (a *app) Run() {
 
 		w.Write(result)
 	})
+
 	mux.HandleFunc("POST /account/", controller.NewAccountController(connection).HandlePostAccount)
 	mux.HandleFunc("GET /account/{id}", controller.NewAccountController(connection).HandleGetAccountByID)
 	mux.HandleFunc("GET /account/", controller.NewAccountController(connection).HandleGetAllAccount)
+	mux.HandleFunc("PUT /account/", controller.NewAccountController(connection).HandleUpdateAccount)
+	mux.HandleFunc("DELETE /account/{id}", controller.NewAccountController(connection).HandleDeleteAccount)
 
 	fmt.Printf("server start :0\n")
 

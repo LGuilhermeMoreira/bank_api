@@ -28,7 +28,7 @@ func (a accountController) HandlePostAccount(w http.ResponseWriter, r *http.Requ
 
 	// desserializando
 	if err := json.NewDecoder(body).Decode(&accountDTO); err != nil {
-		msg := "unmarshal not completed"
+		msg := "unmarshal not completed: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		log.Fatalln(msg)
 		return
@@ -41,7 +41,7 @@ func (a accountController) HandlePostAccount(w http.ResponseWriter, r *http.Requ
 	stmt, err := a.conn.Db.Prepare("insert into accounts(id,owner,balance) values (?,?,?)")
 
 	if err != nil {
-		msg := "error preparing the query"
+		msg := "error preparing the query: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		log.Fatalln(msg)
 		return
@@ -50,7 +50,7 @@ func (a accountController) HandlePostAccount(w http.ResponseWriter, r *http.Requ
 	defer stmt.Close()
 
 	if _, err := stmt.Exec(account.ID, account.Owner, account.Balance); err != nil {
-		msg := "error executing the query"
+		msg := "error executing the query: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		log.Fatalln(msg)
 		return
@@ -71,7 +71,7 @@ func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.R
 	stmt, err := a.conn.Db.Prepare("Select id,owner,balance from accounts where id = ?")
 
 	if err != nil {
-		msg := "error preparing the query"
+		msg := "error preparing the query: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		log.Fatalln(msg)
 		return
@@ -80,7 +80,7 @@ func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.R
 	defer stmt.Close()
 
 	if err = stmt.QueryRow(id).Scan(&queryResult.ID, &queryResult.Owner, &queryResult.Balance); err != nil {
-		msg := "error executing the query"
+		msg := "error executing the query: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		log.Fatalln(msg)
 		return
@@ -88,11 +88,13 @@ func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.R
 
 	// sending the json
 	if err := json.NewEncoder(w).Encode(&queryResult); err != nil {
-		msg := "error marshaling the struct"
+		msg := "error marshaling the struct: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		log.Fatalln(msg)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (a accountController) HandleGetAllAccount(w http.ResponseWriter, r *http.Request) {
@@ -131,4 +133,58 @@ func (a accountController) HandleGetAllAccount(w http.ResponseWriter, r *http.Re
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
+}
+
+func (a accountController) HandleUpdateAccount(w http.ResponseWriter, r *http.Request) {
+	bodyRequest := r.Body
+
+	var body struct {
+		ID      string  `json:"id"`
+		Owner   string  `json:"owner"`
+		Balance float64 `json:"balance"`
+	}
+
+	if err := json.NewDecoder(bodyRequest).Decode(&body); err != nil {
+		msg := "unmarshal not complete: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	stmt, err := a.conn.Db.Prepare("UPDATE accounts SET owner = ?, balance = ? WHERE id = ?")
+
+	if err != nil {
+		msg := "database can not prepared: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	_, err = stmt.Exec(&body.Owner, &body.Balance, &body.ID)
+
+	if err != nil {
+		msg := "database can not prepared: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a accountController) HandleDeleteAccount(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	stmt, err := a.conn.Db.Prepare("Delete from accounts where id = ?")
+
+	if err != nil {
+		msg := "database can not prepared: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	_, err = stmt.Exec(&id)
+
+	if err != nil {
+		msg := "database can not prepared: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

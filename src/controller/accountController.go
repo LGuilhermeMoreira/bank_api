@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -57,7 +56,8 @@ func (a accountController) HandlePostAccount(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	fmt.Println("conta cadastrada")
+	// w.Write()
+	// fmt.Println("conta cadastrada")
 
 }
 
@@ -86,6 +86,9 @@ func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	// sending the json
 	if err := json.NewEncoder(w).Encode(&queryResult); err != nil {
 		msg := "error marshaling the struct: " + err.Error()
@@ -94,7 +97,6 @@ func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 }
 
 func (a accountController) HandleGetAllAccount(w http.ResponseWriter, r *http.Request) {
@@ -127,12 +129,16 @@ func (a accountController) HandleGetAllAccount(w http.ResponseWriter, r *http.Re
 		accounts = append(accounts, account)
 	}
 
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
 	err = json.NewEncoder(w).Encode(accounts)
 	if err != nil {
 		msg := "error encoding response: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
+
 }
 
 func (a accountController) HandleUpdateAccount(w http.ResponseWriter, r *http.Request) {

@@ -9,9 +9,8 @@ import (
 )
 
 type DtoAccount struct {
-	ID      uuid.UUID `json:"id"`
-	Owner   string    `json:"owner"`
-	Balance string    `json:"balance"`
+	Owner   string `json:"owner"`
+	Balance string `json:"balance"`
 }
 
 func (d DtoAccount) ConvertToModelAccount() *models.Account {
@@ -23,7 +22,7 @@ func (d DtoAccount) ConvertToModelAccount() *models.Account {
 	}
 
 	return &models.Account{
-		ID:      d.ID,
+		ID:      uuid.New(),
 		Owner:   d.Owner,
 		Balance: balance,
 	}

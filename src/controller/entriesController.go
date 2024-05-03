@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
+	"github.com/LGuilhermeMoreira/bank_api/src/utils/dto"
 	"github.com/google/uuid"
 )
 
@@ -58,9 +59,37 @@ func (e entriesController) HandleGetAllEntries(w http.ResponseWriter, r *http.Re
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	// w.WriteHeader(http.StatusOK)
 }
 
 func (e entriesController) HandlePostEntrie(w http.ResponseWriter, r *http.Request) {
+	requestBody := r.Body
 
+	var dtoEntrie dto.DtoEntrie
+
+	if err := json.NewDecoder(requestBody).Decode(&dtoEntrie); err != nil {
+		msg := "error decoding: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	entrie := dtoEntrie.ConvertToModelEntrie()
+
+	stmt, err := e.conn.Db.Prepare("insert into entries(account_id,amount) values (?,?)")
+
+	if err != nil {
+		msg := "error preparing database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	defer stmt.Close()
+
+	if _, err = stmt.Exec(&entrie.Account_ID, &entrie.Amount); err != nil {
+		msg := "error executing database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }

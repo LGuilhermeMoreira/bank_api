@@ -43,11 +43,16 @@ func (a *app) Run() {
 		w.Write(result)
 	})
 
+	// account routes
 	mux.HandleFunc("POST /account/", controller.NewAccountController(connection).HandlePostAccount)
 	mux.HandleFunc("GET /account/{id}", controller.NewAccountController(connection).HandleGetAccountByID)
 	mux.HandleFunc("GET /account/", controller.NewAccountController(connection).HandleGetAllAccount)
 	mux.HandleFunc("PUT /account/", controller.NewAccountController(connection).HandleUpdateAccount)
 	mux.HandleFunc("DELETE /account/{id}", controller.NewAccountController(connection).HandleDeleteAccount)
+
+	// entrie routes
+	mux.HandleFunc("GET /entrie/", controller.NewEntrieController(connection).HandleGetAllEntries)
+	mux.HandleFunc("POST /entrie/", controller.NewEntrieController(connection).HandlePostEntrie)
 
 	fmt.Printf("server start :0\n")
 

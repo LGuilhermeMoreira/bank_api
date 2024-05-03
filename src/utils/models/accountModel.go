@@ -7,9 +7,9 @@ import (
 )
 
 type Account struct {
-	ID      uuid.UUID `json:"id"`
-	Owner   string    `json:"owner"`
-	Balance float64   `json:"balance"`
+	ID      uuid.UUID
+	Owner   string
+	Balance float64
 }
 
 func (a Account) Show() {

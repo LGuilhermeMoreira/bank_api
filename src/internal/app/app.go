@@ -1,50 +1,32 @@
 package app
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/LGuilhermeMoreira/bank_api/src/config"
+	"github.com/LGuilhermeMoreira/bank_api/src/database"
+	"github.com/LGuilhermeMoreira/bank_api/src/internal/routes"
 )
 
 type app struct{}
 
-// test
-type messageJson struct {
-	Message string `json:"message"`
-}
-
 func (a *app) Run() {
-
-	// start a server mux
-	mux := http.NewServeMux()
-
 	config := config.NewConfig()
 
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
+	conn := database.NewConnection()
 
-		msg := messageJson{
-			Message: "ola mundo!",
-		}
+	router := routes.NewRounter(conn)
 
-		result, err := json.Marshal(msg)
-
-		if err != nil {
-			panic(err)
-		}
-
-		w.Write(result)
-	})
-
-	// account routes
-
-	fmt.Printf("server start :0\n")
+	server := http.Server{
+		Addr:    fmt.Sprintf(":%v", config.Port),
+		Handler: router.Mux,
+	}
 
 	// start server
-	http.ListenAndServe(fmt.Sprintf(":%v", config.Port), mux)
+	fmt.Printf("server start :0\n")
+
+	server.ListenAndServe()
 }
 
 func NewApp() *app {

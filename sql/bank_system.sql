@@ -30,3 +30,4 @@ CREATE TABLE IF NOT EXISTS `transfers` (
     FOREIGN KEY (`to_account_id`) REFERENCES `accounts` (`id`),
     FOREIGN KEY (`from_account_id`) REFERENCES `accounts` (`id`)
 );
+

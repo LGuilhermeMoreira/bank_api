@@ -6,6 +6,7 @@ import (
 
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
 	"github.com/LGuilhermeMoreira/bank_api/src/internal/dto"
+	"github.com/google/uuid"
 )
 
 type accountController struct {
@@ -52,4 +53,96 @@ func (a accountController) HandleCreateAccountController(w http.ResponseWriter, 
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	var account struct {
+		ID             uuid.UUID `json:"id"`
+		LoginAccountID uuid.UUID `json:"login_account_id"`
+		Owner          string    `json:"owner"`
+		Balance        float64   `json:"balance"`
+	}
+
+	stmt, err := a.conn.Db.Prepare("select id,login_account_id,owner,balance from accounts where id = ?")
+
+	if err != nil {
+		msg := "Error preparing database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	defer stmt.Close()
+
+	if err = stmt.QueryRow(id).Scan(&account.ID, &account.LoginAccountID, &account.Owner, &account.Balance); err != nil {
+		msg := "Error running database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	response, err := json.Marshal(&account)
+
+	if err != nil {
+		msg := "Error marshalling the json response: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
+}
+
+func (a accountController) HandleGetAllAccounts(w http.ResponseWriter, r *http.Request) {
+	stmt, err := a.conn.Db.Prepare("select id,login_account_id,owner,balance from accounts")
+
+	if err != nil {
+		msg := "Error preparing database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+
+	if err != nil {
+		msg := "Error querying database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	var accounts []struct {
+		ID             uuid.UUID
+		LoginAccountID uuid.UUID
+		Owner          string
+		Balance        float64
+	}
+
+	for rows.Next() {
+		var account struct {
+			ID             uuid.UUID
+			LoginAccountID uuid.UUID
+			Owner          string
+			Balance        float64
+		}
+
+		if err = rows.Scan(&account.ID, &account.LoginAccountID, &account.Owner, &account.Balance); err != nil {
+			msg := "Error querying database: " + err.Error()
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
+		accounts = append(accounts, account)
+	}
+
+	response, err := json.Marshal(&accounts)
+
+	if err != nil {
+		msg := "Error querying database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
 }

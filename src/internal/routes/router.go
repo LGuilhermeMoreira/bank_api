@@ -14,9 +14,13 @@ type router struct {
 func NewRounter(conn *database.Connection) *router {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /login/", controller.NewLoginAccountController(conn).HandleCreateLoginAccount)
-	mux.HandleFunc("POST /login/verify/", controller.NewLoginAccountController(conn).HandleVerifyLoginAccount)
-	mux.HandleFunc("POST /account/", controller.NewAccountController(conn).HandleCreateAccountController)
+	login := controller.NewLoginAccountController(conn)
+	account := controller.NewAccountController(conn)
+	mux.HandleFunc("POST /login/", login.HandleCreateLoginAccount)
+	mux.HandleFunc("POST /login/verify/", login.HandleVerifyLoginAccount)
+	mux.HandleFunc("POST /account/", account.HandleCreateAccountController)
+	mux.HandleFunc("GET /account/{id}", account.HandleGetAccountByID)
+	mux.HandleFunc("GET /account/", account.HandleGetAllAccounts)
 
 	return &router{
 		Mux: mux,

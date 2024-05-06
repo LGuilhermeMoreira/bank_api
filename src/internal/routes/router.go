@@ -16,12 +16,14 @@ func NewRounter(conn *database.Connection) *router {
 
 	mux.HandleFunc("POST /login/", controller.NewLoginAccountController(conn).HandleCreateLoginAccount)
 	mux.HandleFunc("POST /login/verify/", controller.NewLoginAccountController(conn).HandleVerifyLoginAccount)
+	mux.HandleFunc("POST /account/", controller.NewAccountController(conn).HandleCreateAccountController)
 
 	return &router{
 		Mux: mux,
 	}
 }
 
+// middleware example
 // func alwaysShow(next http.HandlerFunc) http.HandlerFunc {
 // 	return func(w http.ResponseWriter, r *http.Request) {
 // 		fmt.Println(r.Method, r.URL.Path)

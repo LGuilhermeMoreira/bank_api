@@ -72,6 +72,7 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 		return
 	}
 
+	defer stmt.Close()
 	var password string
 
 	if err = stmt.QueryRow(login.UserMail).Scan(&password); err != nil {
@@ -79,14 +80,11 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-
-	// compare
-
 	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(login.UserPassword))
 
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-	} else {
-		w.WriteHeader(http.StatusAccepted)
+		return
 	}
+	w.WriteHeader(http.StatusAccepted)
 }

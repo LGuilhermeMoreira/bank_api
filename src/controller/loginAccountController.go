@@ -6,6 +6,7 @@ import (
 
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
 	"github.com/LGuilhermeMoreira/bank_api/src/internal/dto"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -52,7 +53,23 @@ func (l loginAccountController) HandleCreateLoginAccount(w http.ResponseWriter, 
 		return
 	}
 
+	var loginOutput struct {
+		ID uuid.UUID `json:"id"`
+	}
+
+	loginOutput.ID = loginModel.ID
+
+	response, err := json.Marshal(&loginOutput)
+
+	if err != nil {
+		msg := "Error marshalling response: " + err.Error()
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write(response)
 }
 
 func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, r *http.Request) {
@@ -86,5 +103,5 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusFound)
 }

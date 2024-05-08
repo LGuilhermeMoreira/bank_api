@@ -7,11 +7,11 @@ import (
 )
 
 type EntrieModel struct {
-	ID         uuid.UUID
-	Account_ID uuid.UUID
-	Amount     float64
+	ID        uuid.UUID
+	AccountID uuid.UUID
+	Amount    float64
 }
 
 func (e EntrieModel) Show() {
-	fmt.Printf("%v %v", e.Account_ID, e.Amount)
+	fmt.Printf("%v %v", e.AccountID, e.Amount)
 }

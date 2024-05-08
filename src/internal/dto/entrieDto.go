@@ -20,8 +20,8 @@ func (d EntrieInput) ConvertInputToModel() (*models.EntrieModel, error) {
 	}
 
 	return &models.EntrieModel{
-		ID:         uuid.New(),
-		Account_ID: uuid.MustParse(d.AccountID),
-		Amount:     amount,
+		ID:        uuid.New(),
+		AccountID: uuid.MustParse(d.AccountID),
+		Amount:    amount,
 	}, nil
 }

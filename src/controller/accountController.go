@@ -77,7 +77,7 @@ func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.R
 
 	if err = stmt.QueryRow(id).Scan(&account.ID, &account.LoginAccountID, &account.Owner, &account.Balance); err != nil {
 		msg := "Error running database: " + err.Error()
-		http.Error(w, msg, http.StatusInternalServerError)
+		http.Error(w, msg, http.StatusNotFound)
 		return
 	}
 
@@ -112,6 +112,8 @@ func (a accountController) HandleGetAllAccounts(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	defer rows.Close()
+
 	var accounts []struct {
 		ID             uuid.UUID
 		LoginAccountID uuid.UUID
@@ -145,4 +147,59 @@ func (a accountController) HandleGetAllAccounts(w http.ResponseWriter, r *http.R
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
+}
+
+func (a accountController) HandleDeleteAccount(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	stmt, err := a.conn.Db.Prepare("delete from accounts where id = ?")
+
+	if err != nil {
+		msg := "Error preparing database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	defer stmt.Close()
+
+	if _, err = stmt.Query(id); err != nil {
+		msg := "Error running database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (a accountController) HandleUpdateAccount(w http.ResponseWriter, r *http.Request) {
+	bodyRequest := r.Body
+
+	var Owner struct {
+		ID    uuid.UUID `json:"id"`
+		Owner string    `json:"owner"`
+	}
+
+	if err := json.NewDecoder(bodyRequest).Decode(&Owner); err != nil {
+		msg := "Error decoding body request: " + err.Error()
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	stmt, err := a.conn.Db.Prepare("update accounts set owner = ? where id = ?")
+
+	if err != nil {
+		msg := "Error preparing database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	defer stmt.Close()
+
+	if _, err = stmt.Query(Owner.Owner, Owner.ID); err != nil {
+		msg := "Error running database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

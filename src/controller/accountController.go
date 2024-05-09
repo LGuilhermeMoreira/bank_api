@@ -89,6 +89,7 @@ func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
 }
@@ -145,6 +146,8 @@ func (a accountController) HandleGetAllAccounts(w http.ResponseWriter, r *http.R
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
 }

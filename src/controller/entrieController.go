@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
-	"github.com/LGuilhermeMoreira/bank_api/src/internal/dto"
+	"github.com/LGuilhermeMoreira/bank_api/src/utils/dto"
 	"github.com/google/uuid"
 )
 
@@ -172,8 +172,18 @@ func (e entrieController) HandleGetAllAccontEntries(w http.ResponseWriter, r *ht
 			CreateAt time.Time `json:"created_at"`
 		}
 
-		if err = rows.Scan(&entrie.ID, &entrie.Amount, &entrie.CreateAt); err != nil {
+		var createAtString string
+
+		if err = rows.Scan(&entrie.ID, &entrie.Amount, &createAtString); err != nil {
 			msg := "Error scanning database: " + err.Error()
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
+		entrie.CreateAt, err = time.Parse("2006-01-02 15:04:05", createAtString)
+
+		if err != nil {
+			msg := "Error parsing the date"
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}

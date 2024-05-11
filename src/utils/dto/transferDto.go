@@ -3,13 +3,13 @@ package dto
 import (
 	"strconv"
 
-	"github.com/LGuilhermeMoreira/bank_api/src/internal/models"
+	"github.com/LGuilhermeMoreira/bank_api/src/utils/models"
 	"github.com/google/uuid"
 )
 
 type TransferInput struct {
 	ToAccountID   string `json:"to_account_id"`
-	FromAccountID string `json:"from_accoun_id"`
+	FromAccountID string `json:"from_account_id"`
 	Value         string `json:"value"`
 }
 

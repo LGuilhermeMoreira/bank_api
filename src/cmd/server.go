@@ -1,6 +1,6 @@
 package main
 
-import "github.com/LGuilhermeMoreira/bank_api/src/internal/app"
+import "github.com/LGuilhermeMoreira/bank_api/src/utils/app"
 
 func main() {
 	app := app.NewApp()

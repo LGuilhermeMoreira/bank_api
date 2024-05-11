@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
-	"github.com/LGuilhermeMoreira/bank_api/src/internal/dto"
+	"github.com/LGuilhermeMoreira/bank_api/src/utils/dto"
 	"github.com/google/uuid"
 )
 

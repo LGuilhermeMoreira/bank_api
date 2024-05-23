@@ -7,9 +7,7 @@ import (
 )
 
 type Connection struct {
-	Db   *sql.DB
-	name string
-	uri  string
+	Db *sql.DB
 }
 
 func NewConnection() *Connection {
@@ -20,8 +18,6 @@ func NewConnection() *Connection {
 	}
 
 	return &Connection{
-		Db:   db,
-		name: "mysql",
-		uri:  "guigui:guigui@tcp(localhost:3305)/bank_db",
+		Db: db,
 	}
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/LGuilhermeMoreira/bank_api/src/config"
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
-	"github.com/LGuilhermeMoreira/bank_api/src/middleware"
 	"github.com/LGuilhermeMoreira/bank_api/src/utils/routes"
 )
 
@@ -18,8 +17,6 @@ func (a *app) Run() {
 	conn := database.NewConnection()
 
 	router := routes.NewRounter(conn)
-
-	http.Handle("/", middleware.LogMiddleware(router.Mux))
 
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%v", config.Port),

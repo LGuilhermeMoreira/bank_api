@@ -1,10 +1,12 @@
 package routes
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/LGuilhermeMoreira/bank_api/src/controller"
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
+	"github.com/LGuilhermeMoreira/bank_api/src/middleware"
 )
 
 type router struct {
@@ -18,23 +20,45 @@ func NewRounter(conn *database.Connection) *router {
 	account := controller.NewAccountController(conn)
 	entrie := controller.NewEntrieController(conn)
 	transfer := controller.NewTransferController(conn)
+
+	//pint - pong
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		msg := map[string]string{
+			"ping": "pong",
+		}
+
+		bytes, err := json.Marshal(msg)
+
+		if err != nil {
+			erro := "Error marshalling json"
+			http.Error(w, erro, http.StatusInternalServerError)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(bytes)
+	})
+
 	// login
-	mux.HandleFunc("POST /login/", login.HandleCreateLoginAccount)
-	mux.HandleFunc("POST /login/verify/", login.HandleVerifyLoginAccount)
+	mux.HandleFunc("POST /login/", middleware.LogMiddleware(login.HandleCreateLoginAccount))
+	mux.HandleFunc("POST /login/verify/", middleware.LogMiddleware(login.HandleVerifyLoginAccount))
+
 	// account
-	mux.HandleFunc("POST /account/", account.HandleCreateAccountController)
-	mux.HandleFunc("GET /account/{id}/", account.HandleGetAccountByID)
-	mux.HandleFunc("GET /account/", account.HandleGetAllAccounts)
-	mux.HandleFunc("DELETE /account/{id}/", account.HandleDeleteAccount)
-	mux.HandleFunc("PUT /account/", account.HandleUpdateAccount)
+	mux.HandleFunc("POST /account/", middleware.LogMiddleware(account.HandleCreateAccountController))
+	mux.HandleFunc("GET /account/{id}/", middleware.LogMiddleware(account.HandleGetAccountByID))
+	mux.HandleFunc("GET /account/", middleware.LogMiddleware(account.HandleGetAllAccounts))
+	mux.HandleFunc("DELETE /account/{id}/", middleware.LogMiddleware(account.HandleDeleteAccount))
+	mux.HandleFunc("PUT /account/", middleware.LogMiddleware(account.HandleUpdateAccount))
+
 	// entrie
-	mux.HandleFunc("POST /entrie/", entrie.HandleCreateEntrie)
-	mux.HandleFunc("GET /entrie/", entrie.HandleGetAllEntries)
+	mux.HandleFunc("POST /entrie/", middleware.LogMiddleware(entrie.HandleCreateEntrie))
+	mux.HandleFunc("GET /entrie/", middleware.LogMiddleware(entrie.HandleGetAllEntries))
 	mux.HandleFunc("GET /entrie/{id}/", entrie.HandleGetAllAccontEntries)
+
 	// transfer
-	mux.HandleFunc("POST /transfer/", transfer.HandleCreateTransfer)
-	mux.HandleFunc("GET /transfer/", transfer.HandleGetAllTransfer)
-	mux.HandleFunc("GET /transfer/{id}/", transfer.HandleGetAllTransferAccount)
+	mux.HandleFunc("POST /transfer/", middleware.LogMiddleware(transfer.HandleCreateTransfer))
+	mux.HandleFunc("GET /transfer/", middleware.LogMiddleware(transfer.HandleGetAllTransfer))
+	mux.HandleFunc("GET /transfer/{id}/", middleware.LogMiddleware(transfer.HandleGetAllTransferAccount))
 
 	return &router{
 		Mux: mux,

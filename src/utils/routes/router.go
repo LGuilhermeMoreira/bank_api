@@ -21,6 +21,8 @@ func NewRounter(conn *database.Connection) *router {
 	entrie := controller.NewEntrieController(conn)
 	transfer := controller.NewTransferController(conn)
 
+	// jwt := middleware.NewJWT()
+
 	//pint - pong
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		msg := map[string]string{

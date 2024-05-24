@@ -14,7 +14,7 @@ type app struct{}
 func (a *app) Run() {
 	config := config.NewConfig()
 
-	conn := database.NewConnection()
+	conn := database.NewConnection(config.DatabaseName, config.DatabaseUri)
 
 	router := routes.NewRounter(conn)
 

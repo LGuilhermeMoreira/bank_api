@@ -6,7 +6,7 @@ import (
 
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
 	"github.com/LGuilhermeMoreira/bank_api/src/utils/dto"
-	"github.com/google/uuid"
+	"github.com/dgrijalva/jwt-go/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -53,11 +53,21 @@ func (l loginAccountController) HandleCreateLoginAccount(w http.ResponseWriter, 
 		return
 	}
 
-	var loginOutput struct {
-		ID uuid.UUID `json:"id"`
+	claims := jwt.MapClaims{
+		"AccountID": loginModel.ID,
 	}
 
-	loginOutput.ID = loginModel.ID
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte("sua_chave_secreta"))
+	if err != nil {
+		http.Error(w, "Erro ao gerar token JWT", http.StatusInternalServerError)
+		return
+	}
+
+	loginOutput := map[string]interface{}{
+		"id":    loginModel.ID,
+		"token": signedToken,
+	}
 
 	response, err := json.Marshal(&loginOutput)
 
@@ -106,5 +116,5 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 
 	// retunr the jwtToken
 
-	w.WriteHeader(http.StatusFound)
+	w.WriteHeader(http.StatusOK)
 }

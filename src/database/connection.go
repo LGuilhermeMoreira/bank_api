@@ -10,8 +10,8 @@ type Connection struct {
 	Db *sql.DB
 }
 
-func NewConnection() *Connection {
-	db, err := sql.Open("mysql", "guigui:guigui@tcp(localhost:3305)/bank_db")
+func NewConnection(name, uri string) *Connection {
+	db, err := sql.Open(name, uri)
 
 	if err != nil {
 		panic(err)

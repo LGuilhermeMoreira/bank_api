@@ -48,11 +48,25 @@ func (a accountController) HandleCreateAccountController(w http.ResponseWriter, 
 
 	if _, err = stmt.Exec(&accountModel.ID, &accountModel.LoginAccountID, &accountModel.Owner, &accountModel.Balance); err != nil {
 		msg := "Error running database: " + err.Error()
-		http.Error(w, msg, http.StatusBadRequest)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 
+	msg := map[string]interface{}{
+		"id": accountModel.ID,
+	}
+
+	bytes, err := json.Marshal(msg)
+
+	if err != nil {
+		msg := "Error marshalling response: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write(bytes)
 }
 
 func (a accountController) HandleGetAccountByID(w http.ResponseWriter, r *http.Request) {
@@ -116,18 +130,18 @@ func (a accountController) HandleGetAllAccounts(w http.ResponseWriter, r *http.R
 	defer rows.Close()
 
 	var accounts []struct {
-		ID             uuid.UUID
-		LoginAccountID uuid.UUID
-		Owner          string
-		Balance        float64
+		ID             uuid.UUID `json:"id"`
+		LoginAccountID uuid.UUID `json:"login_account_id"`
+		Owner          string    `json:"owner"`
+		Balance        float64   `json:"balance"`
 	}
 
 	for rows.Next() {
 		var account struct {
-			ID             uuid.UUID
-			LoginAccountID uuid.UUID
-			Owner          string
-			Balance        float64
+			ID             uuid.UUID `json:"id"`
+			LoginAccountID uuid.UUID `json:"login_account_id"`
+			Owner          string    `json:"owner"`
+			Balance        float64   `json:"balance"`
 		}
 
 		if err = rows.Scan(&account.ID, &account.LoginAccountID, &account.Owner, &account.Balance); err != nil {

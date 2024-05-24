@@ -1,7 +1,7 @@
-version : '3.7'
+version: '3.7'
 
 services:
-  db: 
+  db:
     image: mysql:latest
     container_name: db
     environment:
@@ -12,3 +12,8 @@ services:
     ports:
       - '3305:3306'
     restart: always
+    volumes:
+      - polls_mysql:/var/lib/mysql
+
+volumes:
+  polls_mysql:

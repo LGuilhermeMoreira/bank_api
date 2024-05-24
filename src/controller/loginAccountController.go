@@ -103,5 +103,8 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	// retunr the jwtToken
+
 	w.WriteHeader(http.StatusFound)
 }

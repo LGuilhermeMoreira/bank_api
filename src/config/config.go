@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type config struct {
+type Config struct {
 	Port         int
 	DatabaseUri  string
 	DatabaseName string
@@ -15,8 +15,8 @@ type config struct {
 	JwtPassword  string
 }
 
-func NewConfig() *config {
-	return &config{
+func NewConfig() *Config {
+	return &Config{
 		Port:         getPort(),
 		DatabaseUri:  getDatabaseURI(),
 		DatabaseName: getDatabaseName(),

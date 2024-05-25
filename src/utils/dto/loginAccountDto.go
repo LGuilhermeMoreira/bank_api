@@ -11,6 +11,29 @@ type LoginAccountInput struct {
 	UserPassword string `json:"user_password"`
 }
 
+type LoginAccountOutput struct {
+	ID    uuid.UUIDs `json:"login_id"`
+	Token string     `json:"token"`
+}
+
+type LoginAccountVerifyOutput struct {
+	ID        string `json:"login_id"`
+	AccountID string `json:"account_id"`
+	Owner     string `json:"owner"`
+	Balance   string `json:"balance"`
+	Token     string `json:"token"`
+}
+
+func NewLoginAccountVerify(id, account_id, owner, balance, token string) *LoginAccountVerifyOutput {
+	return &LoginAccountVerifyOutput{
+		ID:        id,
+		AccountID: account_id,
+		Owner:     owner,
+		Balance:   balance,
+		Token:     token,
+	}
+}
+
 func (d LoginAccountInput) ConvertInputToModel() (*models.LoginAccountModel, error) {
 
 	bytePassword, err := bcrypt.GenerateFromPassword([]byte(d.UserPassword), 10)

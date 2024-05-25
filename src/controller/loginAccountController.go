@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/LGuilhermeMoreira/bank_api/src/config"
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
 	"github.com/LGuilhermeMoreira/bank_api/src/utils/dto"
 	"github.com/dgrijalva/jwt-go/v4"
@@ -12,11 +13,13 @@ import (
 
 type loginAccountController struct {
 	conn *database.Connection
+	conf *config.Config
 }
 
-func NewLoginAccountController(connection *database.Connection) loginAccountController {
+func NewLoginAccountController(connection *database.Connection, configuration *config.Config) loginAccountController {
 	return loginAccountController{
 		conn: connection,
+		conf: configuration,
 	}
 }
 
@@ -58,7 +61,9 @@ func (l loginAccountController) HandleCreateLoginAccount(w http.ResponseWriter, 
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte("sua_chave_secreta"))
+
+	signedToken, err := token.SignedString([]byte(l.conf.JwtPassword))
+
 	if err != nil {
 		http.Error(w, "Erro ao gerar token JWT", http.StatusInternalServerError)
 		return
@@ -83,15 +88,20 @@ func (l loginAccountController) HandleCreateLoginAccount(w http.ResponseWriter, 
 }
 
 func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, r *http.Request) {
-	var login dto.LoginAccountInput
+	var loginInput dto.LoginAccountInput
 
-	if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
-		msg := "Error decoding: " + err.Error()
+	if err := json.NewDecoder(r.Body).Decode(&loginInput); err != nil {
+		msg := "Error decoding body request: " + err.Error()
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 
-	stmt, err := l.conn.Db.Prepare("select user_password from login_accounts where user_mail = ?")
+	var verifyData struct {
+		id       string
+		password string
+	}
+
+	stmt, err := l.conn.Db.Prepare("select id,user_password from login_accounts where user_mail = ?")
 
 	if err != nil {
 		msg := "Error preparing database: " + err.Error()
@@ -99,22 +109,76 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 		return
 	}
 
-	defer stmt.Close()
-	var password string
-
-	if err = stmt.QueryRow(login.UserMail).Scan(&password); err != nil {
-		msg := "Error running database: " + err.Error()
+	if err := stmt.QueryRow(loginInput.UserMail).Scan(&verifyData.id, verifyData.password); err != nil {
+		msg := "Error querying database: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(login.UserPassword))
 
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+	if !helpVerifyPassword([]byte(loginInput.UserPassword), []byte(verifyData.password)) {
+		msg := "Error when loggin in"
+		http.Error(w, msg, http.StatusUnauthorized)
 		return
 	}
 
-	// retunr the jwtToken
+	var accountData struct {
+		ID      string
+		Owner   string
+		Balance string
+	}
 
-	w.WriteHeader(http.StatusOK)
+	stmt, err = l.conn.Db.Prepare("select id,owner,balance from accounts where login_accounts_id = ?")
+
+	if err != nil {
+		msg := "Error preparing database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	if err = stmt.QueryRow(verifyData.id).Scan(&accountData.ID, &accountData.Owner, &accountData.Balance); err != nil {
+		msg := "Error querying database: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	token, err := helpCreateJWT(accountData.ID, accountData.Owner, accountData.Balance, l.conf.JwtPassword)
+
+	if err != nil {
+		msg := "Error generating token: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	response := dto.NewLoginAccountVerify(verifyData.id, accountData.ID, accountData.Owner, accountData.Balance, token)
+
+	bytes, err := json.Marshal(response)
+
+	if err != nil {
+		msg := "Error marshalling json: " + err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusAccepted)
+	w.Write(bytes)
+}
+
+func helpCreateJWT(id, owner, balance, key string) (string, error) {
+	claims := jwt.MapClaims{
+		"id":      id,
+		"owner":   owner,
+		"balance": balance,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(key))
+}
+
+func helpVerifyPassword(password, hashedPassword []byte) bool {
+	if err := bcrypt.CompareHashAndPassword(hashedPassword, password); err == nil {
+		return true
+	}
+	return false
 }

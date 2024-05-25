@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/LGuilhermeMoreira/bank_api/src/config"
 	"github.com/LGuilhermeMoreira/bank_api/src/controller"
 	"github.com/LGuilhermeMoreira/bank_api/src/database"
 	"github.com/LGuilhermeMoreira/bank_api/src/middleware"
@@ -13,10 +14,10 @@ type router struct {
 	Mux *http.ServeMux
 }
 
-func NewRounter(conn *database.Connection) *router {
+func NewRounter(conn *database.Connection, conf *config.Config) *router {
 	mux := http.NewServeMux()
 
-	login := controller.NewLoginAccountController(conn)
+	login := controller.NewLoginAccountController(conn, conf)
 	account := controller.NewAccountController(conn)
 	entrie := controller.NewEntrieController(conn)
 	transfer := controller.NewTransferController(conn)

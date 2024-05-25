@@ -16,7 +16,7 @@ func (a *app) Run() {
 
 	conn := database.NewConnection(config.DatabaseName, config.DatabaseUri)
 
-	router := routes.NewRounter(conn)
+	router := routes.NewRounter(conn, config)
 
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%v", config.Port),

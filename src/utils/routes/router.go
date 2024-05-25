@@ -21,6 +21,7 @@ func NewRounter(conn *database.Connection, conf *config.Config) *router {
 	account := controller.NewAccountController(conn)
 	entrie := controller.NewEntrieController(conn)
 	transfer := controller.NewTransferController(conn)
+	jwt := middleware.NewJWT(*conf)
 
 	// jwt := middleware.NewJWT()
 
@@ -48,20 +49,19 @@ func NewRounter(conn *database.Connection, conf *config.Config) *router {
 
 	// account
 	mux.HandleFunc("POST /account/", middleware.LogMiddleware(account.HandleCreateAccountController))
-	mux.HandleFunc("GET /account/{id}/", middleware.LogMiddleware(account.HandleGetAccountByID))
-	mux.HandleFunc("GET /account/", middleware.LogMiddleware(account.HandleGetAllAccounts))
-	mux.HandleFunc("DELETE /account/{id}/", middleware.LogMiddleware(account.HandleDeleteAccount))
-	mux.HandleFunc("PUT /account/", middleware.LogMiddleware(account.HandleUpdateAccount))
-
+	mux.HandleFunc("GET /account/{id}/", middleware.LogMiddleware(jwt.VerifyAuthToken(account.HandleGetAccountByID)))
+	mux.HandleFunc("GET /account/", middleware.LogMiddleware(jwt.VerifyAuthToken(account.HandleGetAllAccounts)))
+	mux.HandleFunc("DELETE /account/{id}/", middleware.LogMiddleware(jwt.VerifyAuthToken(account.HandleDeleteAccount)))
+	mux.HandleFunc("PUT /account/", middleware.LogMiddleware(jwt.VerifyAuthToken(account.HandleDeleteAccount)))
 	// entrie
-	mux.HandleFunc("POST /entrie/", middleware.LogMiddleware(entrie.HandleCreateEntrie))
-	mux.HandleFunc("GET /entrie/", middleware.LogMiddleware(entrie.HandleGetAllEntries))
-	mux.HandleFunc("GET /entrie/{id}/", entrie.HandleGetAllAccontEntries)
+	mux.HandleFunc("POST /entrie/", middleware.LogMiddleware(jwt.VerifyAuthToken(entrie.HandleCreateEntrie)))
+	mux.HandleFunc("GET /entrie/", middleware.LogMiddleware(jwt.VerifyAuthToken(entrie.HandleGetAllEntries)))
+	mux.HandleFunc("GET /entrie/{id}/", middleware.LogMiddleware(jwt.VerifyAuthToken(entrie.HandleGetAllAccontEntries)))
 
 	// transfer
-	mux.HandleFunc("POST /transfer/", middleware.LogMiddleware(transfer.HandleCreateTransfer))
-	mux.HandleFunc("GET /transfer/", middleware.LogMiddleware(transfer.HandleGetAllTransfer))
-	mux.HandleFunc("GET /transfer/{id}/", middleware.LogMiddleware(transfer.HandleGetAllTransferAccount))
+	mux.HandleFunc("POST /transfer/", middleware.LogMiddleware(jwt.VerifyAuthToken(transfer.HandleCreateTransfer)))
+	mux.HandleFunc("GET /transfer/", middleware.LogMiddleware(jwt.VerifyAuthToken(transfer.HandleGetAllTransfer)))
+	mux.HandleFunc("GET /transfer/{id}/", middleware.LogMiddleware(jwt.VerifyAuthToken(transfer.HandleGetAllTransferAccount)))
 
 	return &router{
 		Mux: mux,

@@ -13,10 +13,10 @@ type JWT struct {
 }
 
 // NewJWT returns new JWT.
-func NewJWT() *JWT {
+func NewJWT(conf config.Config) *JWT {
 
 	return &JWT{
-		secret: config.NewConfig().JwtPassword,
+		secret: conf.JwtPassword,
 	}
 }
 

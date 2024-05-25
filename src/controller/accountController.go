@@ -169,7 +169,7 @@ func (a accountController) HandleGetAllAccounts(w http.ResponseWriter, r *http.R
 func (a accountController) HandleDeleteAccount(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	stmt, err := a.conn.Db.Prepare("delete from accounts where id = ?")
+	stmt, err := a.conn.Db.Prepare("delete from login_accounts where id = ?")
 
 	if err != nil {
 		msg := "Error preparing database: " + err.Error()

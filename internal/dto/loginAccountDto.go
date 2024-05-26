@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/LGuilhermeMoreira/bank_api/src/utils/models"
+	"github.com/LGuilhermeMoreira/bank_api/internal/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )

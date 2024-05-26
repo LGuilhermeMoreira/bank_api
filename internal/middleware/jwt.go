@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/LGuilhermeMoreira/bank_api/src/config"
+	"github.com/LGuilhermeMoreira/bank_api/config"
 	"github.com/dgrijalva/jwt-go/v4"
 )
 

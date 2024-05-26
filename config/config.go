@@ -26,7 +26,7 @@ func NewConfig() *Config {
 }
 
 func getPort() int {
-	if err := godotenv.Load("../../.env"); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		panic(err)
 	}
 
@@ -42,7 +42,7 @@ func getPort() int {
 }
 
 func getDatabaseURI() string {
-	if err := godotenv.Load("../../.env"); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		panic(err)
 	}
 
@@ -50,7 +50,7 @@ func getDatabaseURI() string {
 }
 
 func getDatabaseName() string {
-	if err := godotenv.Load("../../.env"); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		panic(err)
 	}
 
@@ -58,7 +58,7 @@ func getDatabaseName() string {
 }
 
 func getJwtTime() int {
-	if err := godotenv.Load("../../.env"); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		panic(err)
 	}
 
@@ -74,7 +74,7 @@ func getJwtTime() int {
 }
 
 func getJWTPassword() string {
-	if err := godotenv.Load("../../.env"); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		panic(err)
 	}
 

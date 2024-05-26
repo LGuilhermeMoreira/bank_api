@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/LGuilhermeMoreira/bank_api/src/config"
-	"github.com/LGuilhermeMoreira/bank_api/src/controller"
-	"github.com/LGuilhermeMoreira/bank_api/src/database"
-	"github.com/LGuilhermeMoreira/bank_api/src/middleware"
+	"github.com/LGuilhermeMoreira/bank_api/config"
+	"github.com/LGuilhermeMoreira/bank_api/internal/controller"
+	"github.com/LGuilhermeMoreira/bank_api/internal/infra/database"
+	"github.com/LGuilhermeMoreira/bank_api/internal/middleware"
 )
 
 type router struct {

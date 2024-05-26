@@ -1,2 +1,4 @@
 .env
-docker-compose.yaml
+docker-compose.yml
+README.md
+run.sh

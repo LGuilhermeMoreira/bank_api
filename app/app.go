@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/LGuilhermeMoreira/bank_api/src/config"
-	"github.com/LGuilhermeMoreira/bank_api/src/database"
-	"github.com/LGuilhermeMoreira/bank_api/src/utils/routes"
+	"github.com/LGuilhermeMoreira/bank_api/config"
+	"github.com/LGuilhermeMoreira/bank_api/internal/infra/database"
+	"github.com/LGuilhermeMoreira/bank_api/routes"
 )
 
 type app struct{}

@@ -1,3 +1,3 @@
-cd src/cmd
+cd cmd
 
 go run server.go

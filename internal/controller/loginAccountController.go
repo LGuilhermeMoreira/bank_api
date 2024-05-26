@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/LGuilhermeMoreira/bank_api/src/config"
-	"github.com/LGuilhermeMoreira/bank_api/src/database"
-	"github.com/LGuilhermeMoreira/bank_api/src/utils/dto"
+	"github.com/LGuilhermeMoreira/bank_api/config"
+	"github.com/LGuilhermeMoreira/bank_api/internal/dto"
+	"github.com/LGuilhermeMoreira/bank_api/internal/infra/database"
 	"github.com/dgrijalva/jwt-go/v4"
 	"golang.org/x/crypto/bcrypt"
 )

@@ -3,7 +3,7 @@ package dto
 import (
 	"strconv"
 
-	"github.com/LGuilhermeMoreira/bank_api/src/utils/models"
+	"github.com/LGuilhermeMoreira/bank_api/internal/models"
 	"github.com/google/uuid"
 )
 

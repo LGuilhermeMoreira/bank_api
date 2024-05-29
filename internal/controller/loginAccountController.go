@@ -32,6 +32,7 @@ func (l loginAccountController) HandleCreateLoginAccount(w http.ResponseWriter, 
 		return
 	}
 
+	// refact this.
 	stmt, err := l.conn.Db.Prepare("INSERT INTO login_accounts(id,user_mail,user_password) values (?,?,?)")
 
 	if err != nil {
@@ -109,7 +110,7 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 		return
 	}
 
-	if err := stmt.QueryRow(loginInput.UserMail).Scan(&verifyData.id, verifyData.password); err != nil {
+	if err := stmt.QueryRow(loginInput.UserMail).Scan(&verifyData.id, &verifyData.password); err != nil {
 		msg := "Error querying database: " + err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
@@ -127,7 +128,7 @@ func (l loginAccountController) HandleVerifyLoginAccount(w http.ResponseWriter, 
 		Balance string
 	}
 
-	stmt, err = l.conn.Db.Prepare("select id,owner,balance from accounts where login_accounts_id = ?")
+	stmt, err = l.conn.Db.Prepare("select id,owner,balance from accounts where login_account_id = ?")
 
 	if err != nil {
 		msg := "Error preparing database: " + err.Error()

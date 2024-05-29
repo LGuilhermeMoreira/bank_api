@@ -24,7 +24,7 @@ func (a *app) Run() {
 	}
 
 	// start server
-	fmt.Printf("server start :0\n")
+	fmt.Printf("server start :0\n\n")
 
 	server.ListenAndServe()
 }
